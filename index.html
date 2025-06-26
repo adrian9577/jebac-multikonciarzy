@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Moja Aplikacja API</title>
+    <link rel="stylesheet" href="style.css"> </head>
+<body>
+    <div class="container">
+        <h1>Witaj w Mojej Aplikacji</h1>
+        <p>Aby rozpocząć, proszę wprowadź swój klucz API:</p>
+
+        <div class="api-input-section">
+            <label for="apiKeyInput">Klucz API:</label>
+            <input type="text" id="apiKeyInput" placeholder="Wprowadź swój klucz API">
+            <button id="loadScriptButton">Uruchom Aplikację</button>
+        </div>
+
+        <div id="app-output">
+            </div>
+    </div>
+
+    <script>
+        document.getElementById('loadScriptButton').addEventListener('click', function() {
+            const apiKey = document.getElementById('apiKeyInput').value.trim(); // Pobierz i oczyść klucz API
+
+            if (apiKey) {
+                // Zapisujemy klucz API w localStorage, żeby użytkownik nie musiał go wpisywać ponownie
+                localStorage.setItem('userApiKey', apiKey);
+
+                // Tworzymy element <script> i dodajemy go do strony
+                const script = document.createElement('script');
+                script.src = 'main.js'; // Ścieżka do Twojego głównego skryptu
+                
+                // Kiedy skrypt się załaduje, możemy coś zrobić (np. wywołać funkcję inicjalizującą)
+                script.onload = () => {
+                    console.log('Skrypt main.js został załadowany.');
+                    // Jeśli w main.js masz funkcję np. 'initApp(apiKey)', to możesz ją tutaj wywołać:
+                    // if (typeof initApp === 'function') {
+                    //     initApp(apiKey);
+                    // }
+                    // WAŻNE: Jeśli Twój skrypt od razu zaczyna działać po załadowaniu,
+                    // to samo to wystarczy. Klucz API będzie dostępny globalnie.
+                };
+                
+                // Obsługa błędów ładowania skryptu
+                script.onerror = () => {
+                    document.getElementById('app-output').innerHTML = '<p class="error">Błąd ładowania skryptu. Sprawdź konsolę przeglądarki.</p>';
+                    console.error('Błąd podczas ładowania skryptu main.js');
+                };
+                
+                // Dodajemy skrypt do ciała dokumentu, co rozpocznie jego ładowanie
+                document.body.appendChild(script);
+
+                // Ukrywamy sekcję wprowadzania API, gdy skrypt zacznie działać
+                document.querySelector('.api-input-section').style.display = 'none';
+
+                // Przekazanie klucza API do skryptu main.js
+                // Możesz to zrobić globalnie (mniej eleganckie, ale proste)
+                window.userApiKey = apiKey;
+                // Lub przez argument funkcji, jak pokazano wyżej w komentarzach.
+
+            } else {
+                alert('Proszę wprowadzić klucz API!');
+            }
+        });
+
+        // Sprawdzamy przy ładowaniu strony, czy klucz API już istnieje w localStorage
+        document.addEventListener('DOMContentLoaded', function() {
+            const storedApiKey = localStorage.getItem('userApiKey');
+            if (storedApiKey) {
+                document.getElementById('apiKeyInput').value = storedApiKey;
+                // Opcjonalnie, możesz automatycznie kliknąć przycisk "Uruchom Aplikację",
+                // jeśli chcesz, aby skrypt ładował się od razu po znalezieniu zapisanego API.
+                // document.getElementById('loadScriptButton').click();
+            }
+        });
+    </script>
+</body>
+</html>
