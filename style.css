@@ -1,5 +1,3 @@
-/* Plik style.css pozostaje taki sam jak w poprzedniej odpowiedzi */
-
 body {
     font-family: 'Consolas', monospace, sans-serif;
     background-color: #0a0a0a; /* Ciemne tło */
@@ -51,8 +49,8 @@ h1 {
 }
 
 /* Istniejące style dla input-section, apply only when app-content is active */
-#app-content .input-section {
-    display: flex; /* Będzie widoczne, gdy aplikacja się załaduje */
+#app-content .input-section, .input-section { /* Dodano .input-section dla bezpośredniego zastosowania */
+    display: flex;
     gap: 15px;
     margin-bottom: 25px;
     align-items: center;
