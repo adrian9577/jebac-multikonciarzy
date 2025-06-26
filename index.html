@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>YouTube Description Duplicate Finder - Adrian.C</title>
+    <link rel="stylesheet" href="style.css"> </head>
+<body>
+    <div class="container">
+        <h1>YouTube Description Duplicate Finder</h1>
+        <p class="tagline">Adrian.C - Sprawdzanie duplikatów opisów kanałów na podstawie komentarzy.</p>
+
+        <div class="api-input-section">
+            <label for="apiKeyInput">Twój klucz API YouTube:</label>
+            <input type="password" id="apiKeyInput" placeholder="Wprowadź swój klucz API (np. AIzaSy...)">
+            <button id="loadAppButton">Uruchom Aplikację</button>
+        </div>
+
+        <div id="app-content">
+            </div>
+
+    </div>
+
+    <script>
+        // Ten skrypt inicjuje ładowanie głównej logiki i GUI po podaniu API
+        const apiKeyInput = document.getElementById('apiKeyInput');
+        const loadAppButton = document.getElementById('loadAppButton');
+        const appContentDiv = document.getElementById('app-content');
+
+        // Sprawdź, czy klucz API już istnieje w localStorage przy ładowaniu strony
+        document.addEventListener('DOMContentLoaded', function() {
+            const storedApiKey = localStorage.getItem('userApiKey');
+            const storedVideoId = localStorage.getItem('lastVideoId'); // Możemy zapamiętać ostatni ID filmu
+            if (storedApiKey) {
+                apiKeyInput.value = storedApiKey;
+                // Jeśli klucz jest, możemy od razu spróbować załadować aplikację
+                //loadAppButton.click(); // Automatycznie uruchamia aplikację
+            }
+            if (storedVideoId) {
+                // Tutaj będziemy musieli przenieść logikę ustawiania wartości dla inputu video po załadowaniu głównej aplikacji
+            }
+        });
+
+        loadAppButton.addEventListener('click', function() {
+            const apiKey = apiKeyInput.value.trim();
+
+            if (!apiKey) {
+                alert('Proszę wprowadzić klucz API!');
+                return;
+            }
+
+            // Zapisz klucz API w localStorage
+            localStorage.setItem('userApiKey', apiKey);
+
+            // Ukryj sekcję wprowadzania API
+            document.querySelector('.api-input-section').style.display = 'none';
+
+            // Wstrzyknij strukturę głównej aplikacji do #app-content
+            appContentDiv.innerHTML = `
+                <div class="input-section">
+                    <label for="videoInput">ID filmu lub link YouTube:</label>
+                    <input type="text" id="videoInput" placeholder="Wpisz ID filmu lub link (np. V7r-cgSX4U0)">
+                    <button id="loadVideoButton">Załaduj film</button>
+                    <button id="pauseButton">Pauza</button>
+                </div>
+
+                <p id="statusLabel" class="status-label">Status: Wprowadź ID filmu i kliknij "Załaduj film".</p>
+
+                <div class="table-container">
+                    <table id="duplicatesTable">
+                        <thead>
+                            <tr>
+                                <th>Godzina</th>
+                                <th>Opis (skrót)</th>
+                                <th>Kanały</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            </tbody>
+                    </table>
+                </div>
+
+                <div class="button-group">
+                    <button id="openLastDuplicateButton">Otwórz ostatni duplikat</button>
+                    <button id="resetButton">Resetuj</button>
+                </div>
+            `;
+
+            // Dynamiczne ładowanie skryptu main.js
+            const script = document.createElement('script');
+            script.src = 'main.js';
+            script.onload = () => {
+                console.log('Skrypt main.js został załadowany i uruchomiony.');
+                // Po załadowaniu main.js, możemy przekazać API_KEY i uruchomić funkcję inicjalizującą
+                // Ustaw API_KEY w globalnym scope, aby main.js mógł go odczytać
+                window.APP_API_KEY = apiKey;
+
+                // Sprawdź, czy istnieje zapisany ID filmu i ustaw go
+                const storedVideoId = localStorage.getItem('lastVideoId');
+                if (storedVideoId) {
+                    const videoInputAfterLoad = document.getElementById('videoInput');
+                    if (videoInputAfterLoad) {
+                        videoInputAfterLoad.value = storedVideoId;
+                        // Opcjonalnie: automatyczne ładowanie filmu, jeśli API i Video ID są zapisane
+                        // document.getElementById('loadVideoButton').click();
+                    }
+                }
+                // Jeśli main.js ma funkcję init(), wywołaj ją
+                if (typeof initializeApp === 'function') {
+                    initializeApp();
+                }
+            };
+            script.onerror = () => {
+                appContentDiv.innerHTML = '
